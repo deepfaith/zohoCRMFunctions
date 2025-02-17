@@ -1,0 +1,20 @@
+{
+	"name": "steamConnectIntegration",
+	"version": "1.0.0",
+	"main": "index.js",
+	"author": "alan.ontue@gmail.com",
+	"scripts": {
+		"init": "./node_modules/.bin/tsc --init",
+		"build": "./node_modules/.bin/tsc",
+		"watch": "./node_modules/.bin/tsc --watch"
+	},
+	"dependencies": {
+		"@types/express": "^5.0.0",
+		"@types/node": "^22.13.4",
+		"typescript": "^5.7.3",
+		"zcatalyst-sdk-node": "latest"
+	},
+	"devDependencies": {
+		"axios": "^1.7.9"
+	}
+}

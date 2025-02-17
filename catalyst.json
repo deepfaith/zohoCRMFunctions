@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "targets": [
+      "salesDockIntegration",
+      "steamConnectIntegration"
+    ],
+    "ignore": [],
+    "source": "functions"
+  }
+}
