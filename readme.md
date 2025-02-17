@@ -14,7 +14,7 @@ This project involves the development of a **Zoho Catalyst** event function and 
 - Ensures all relevant lead data is automatically updated in Zoho CRM.
 
 ## Features
-- **Instant Lead Engagement**: As soon as a lead enters Zoho, the AI chatbot sends a WhatsApp message to initiate engagement.
+- **Instant Lead Engagement**: As soon as a lead enters Zoho, it will integrate with Salesdock and Steam Connect.
 - **Data Collection & Qualification**: Gathers relevant lead details and updates Zoho CRM.
 - **Seamless CRM Integration**: Logs all lead interactions within Zoho for tracking and reporting.
 
