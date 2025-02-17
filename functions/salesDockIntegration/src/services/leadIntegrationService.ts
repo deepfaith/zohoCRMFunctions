@@ -38,29 +38,19 @@ class LeadIntegrationService {
   public handleCrmEvent = async (
     eventType: string,
     requestData: any,
-  ): Promise<void> => {
-    try {
-      switch (eventType) {
-        case "Crm_New_Leads__s":
-          await this.createLead(requestData);
-          break;
-        case "Crm_Update_Leads__s":
-          await this.updateLead(requestData);
-          break;
-        case "Crm_Won_Deal__s":
-          await this.convertLead(requestData);
-          break;
-        default:
-          console.log("Unhandled event:", eventType);
-          throw new Error(`Unhandled event: ${eventType}`);
-      }
-    } catch (error) {
-      const errorMessage = `Error handling CRM event: ${(error as Error).message}`;
-      console.error(errorMessage);
-      await this.authService
-        .getLoggingService()
-        .createLog(eventType, errorMessage, "ERROR", requestData);
-      throw new Error(errorMessage);
+  ): Promise<any> => {
+    switch (eventType) {
+      case "Crm_New_Leads__s":
+        return await this.createLead(requestData);
+        break;
+      case "Crm_Update_Leads__s":
+        return await this.updateLead(requestData);
+        break;
+      case "Crm_Won_Deal__s":
+        return await this.convertLead(requestData);
+        break;
+      default:
+        throw new Error(`Unhandled event: ${eventType}`);
     }
   };
 
@@ -71,30 +61,41 @@ class LeadIntegrationService {
    */
   private createLead = async (data: any): Promise<any> => {
     const requestData = {
-      gender: "female",
       firstname: data.First_Name ?? "",
       postcode: data.Zip_Code ?? "",
-      housenumber: "9",
       streetname: data.Street ?? "",
-      city: "Enschede",
-      birthdate: "01-01-1990",
+      city: data.City ?? "",
       email: data.Email ?? "",
-      phone: data.Phone ?? "",
+      phone: (data.Phone || data.Mobile) ?? "",
       business: data.Company ? "1" : "0",
-      company_name: data.Company ?? "",
-      contact_person: "John Alan Doe",
-      coc: "01234567",
-      vat: "NL12345678",
-      user: 2916,
-      planned_for_date: "1",
-      planned_date: "20-04-2021",
-      start_at: "10:00",
-      end_at: "11:00",
-      cf_bankrekeningnur: "NL91ABNA0417164300",
-      "question_payment-method": "Manual",
-      lead_source_id: "86587",
-      labels: [20],
+      company_name: data.Company ?? "ZohoCRM",
     };
+
+    // const requestData = {
+    //   gender: "female",
+    //   firstname: data.First_Name ?? "",
+    //   postcode: data.Zip_Code ?? "",
+    //   housenumber: "9",
+    //   streetname: data.Street ?? "",
+    //   city: "Enschede",
+    //   birthdate: "01-01-1990",
+    //   email: data.Email ?? "",
+    //   phone: data.Phone ?? "",
+    //   business: data.Company ? "1" : "0",
+    //   company_name: data.Company ?? "",
+    //   contact_person: "John Alan Doe",
+    //   coc: "01234567",
+    //   vat: "NL12345678",
+    //   user: 2916,
+    //   planned_for_date: "1",
+    //   planned_date: "20-04-2021",
+    //   start_at: "10:00",
+    //   end_at: "11:00",
+    //   cf_bankrekeningnur: "NL91ABNA0417164300",
+    //   "question_payment-method": "Manual",
+    //   lead_source_id: "86587",
+    //   labels: [20],
+    // };
     return await createLeadInSalesdock(requestData, data.tokens.salesDockToken);
   };
 

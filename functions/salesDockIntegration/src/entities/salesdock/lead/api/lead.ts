@@ -5,21 +5,24 @@ import { salesDockUrl } from "../../../../config";
  * Creates a new lead in Salesdock.
  *
  * @param {any} data - The lead data to create.
+ * @param salesDockApiKey
  * @returns {Promise<any>} - A promise that resolves to the created lead data.
  */
 export const createLeadInSalesdock = async (
   data: any,
   salesDockApiKey: string,
 ): Promise<any> => {
+  const reqData = JSON.stringify(data);
+
   const response: AxiosResponse<any> = await axios.post(
     `${salesDockUrl}/leads`,
+    reqData,
     {
-      company: data.company,
-      lastName: data.last_name,
-      email: data.email,
-    },
-    {
-      headers: { Authorization: `Bearer ${salesDockApiKey}` },
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${salesDockApiKey}`,
+      },
     },
   );
   return response.data;
@@ -29,6 +32,7 @@ export const createLeadInSalesdock = async (
  * Updates a lead in Salesdock.
  *
  * @param {any} data - The lead data to update.
+ * @param salesDockApiKey
  * @returns {Promise<any>} - A promise that resolves to the updated lead data.
  */
 export const updateLeadInSalesdock = async (
@@ -51,6 +55,7 @@ export const updateLeadInSalesdock = async (
  * Converts a lead to a customer in Salesdock.
  *
  * @param {any} data - The lead data to convert.
+ * @param salesDockApiKey
  * @returns {Promise<any>} - A promise that resolves to the converted customer data.
  */
 export const convertLeadToCustomer = async (

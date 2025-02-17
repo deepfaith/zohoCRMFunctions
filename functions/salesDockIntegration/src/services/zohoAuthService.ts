@@ -36,7 +36,6 @@ class ZohoAuthService {
         "SUCCESS",
         this.token,
       );
-      console.log("Tokens", this.token);
     } catch (error) {
       const errorMessage = `Error initializing tokens from Data Store: ${(error as Error).message}`;
       console.error(errorMessage);
@@ -65,7 +64,6 @@ class ZohoAuthService {
         "SUCCESS",
         this.token,
       );
-      console.log("Tokens updated in Data Store");
     } catch (error) {
       const errorMessage = `Error updating tokens in Data Store: ${(error as Error).message}`;
       console.error(errorMessage);
@@ -99,7 +97,6 @@ class ZohoAuthService {
 
       if (response.status === 200) {
         this.token.access_token = response.data.access_token || "";
-        console.log("Access Token renewed:", this.token.access_token);
         await this.loggingService.createLog(
           "initializeTokens",
           "Access Token renewed:",
@@ -112,8 +109,6 @@ class ZohoAuthService {
 
         // Update tokens in the Data Store
         await this.updateTokensInDataStore();
-
-        console.log("Access Tokens Updated:", this.token);
 
         return this.token.access_token;
       } else {

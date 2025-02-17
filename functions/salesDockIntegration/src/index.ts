@@ -12,27 +12,35 @@ module.exports = (event: any, context: any) => {
   integration
     .getLead(leadId)
     .then(async (leadCustomer) => {
-      // integration
-      //   .handleCrmEvent(eventType, leadCustomer)
-      //   .then((data) => {
-      //     console.log("CRM event handled successfully", data);
-      //     context.closeWithSuccess();
-      //   })
-      //   .catch((error) => {
-      //     console.error("Error handling CRM event:", (error as Error).message);
-      //     context.closeWithFailure();
-      //   });
-      await integration
-        .getLoggingService()
-        .createLog(
-          "getLead",
-          "Retrieves a lead by ID from Zoho CRM.",
-          "SUCCESS",
-          leadCustomer,
-        );
-      console.log("Retrieves a lead by ID from Zoho CRM", leadCustomer);
+      if (!leadCustomer)
+        throw new Error("Error retrieving a lead by ID from Zoho CRM");
 
-      context.closeWithSuccess();
+      integration
+        .handleCrmEvent(eventType, leadCustomer)
+        .then(async (data) => {
+          await integration
+            .getLoggingService()
+            .createLog(
+              "handleCrmEvent",
+              "CRM event handled successfully",
+              "SUCCESS",
+              { event: eventType, fromSalesDock: data },
+            );
+          console.log("CRM event handled successfully:", data);
+          context.closeWithSuccess();
+        })
+        .catch(async (error) => {
+          const errorMessage = `Error handling CRM even: ${(error as Error).message}`;
+          console.error(errorMessage);
+          await integration
+            .getLoggingService()
+            .createLog("handleCrmEvent", errorMessage, "ERROR", {
+              event: eventType,
+              leadId: leadId,
+            });
+
+          context.closeWithFailure();
+        });
     })
     .catch(async (error) => {
       const errorMessage = `Error retrieving a lead by ID from Zoho CRM: ${(error as Error).message}`;

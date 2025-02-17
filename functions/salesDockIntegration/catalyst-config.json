@@ -4,7 +4,7 @@
     "stack": "node18",
     "type": "event",
     "env_variables": {
-      "SALESDOCK_API_ENDPOINT": "https://app-staging.salesdock.nl",
+      "SALESDOCK_API_ENDPOINT": "https://app-staging.salesdock.nl/api/groenevrienden/v1",
       "ZOHO_API_ENDPOINT": "https://www.zohoapis.com/crm/v2",
       "ZOHO_API_AUTH_ENDPOINT": "https://accounts.zoho.com/oauth/v2"
     }
