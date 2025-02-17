@@ -12,20 +12,31 @@ export const createLeadInSalesdock = async (
   data: any,
   salesDockApiKey: string,
 ): Promise<any> => {
-  const reqData = JSON.stringify(data);
-
-  const response: AxiosResponse<any> = await axios.post(
-    `${salesDockUrl}/leads`,
-    reqData,
-    {
+  try {
+    const reqData = JSON.stringify(data);
+    const response = await axios.post(`${salesDockUrl}/leads`, reqData, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${salesDockApiKey}`,
       },
-    },
-  );
-  return response.data;
+    });
+    return { responseStatus: 1, ...response.data };
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        // Handle non-fatal API errors (e.g., validation errors, unauthorized, etc.)
+        console.warn(
+          `API responded with status ${error.response.status}:`,
+          error.response.data,
+        );
+        return { responseStatus: 0, ...error.response.data };
+      }
+    }
+    const errorMessage = `Error while creating a lead to salesDock: ${(error as Error).message}`;
+    console.error(errorMessage, error);
+    throw new Error(errorMessage);
+  }
 };
 
 /**

@@ -28,7 +28,7 @@ export const getLeadById = async (
       });
 
       if (response.status === 200) {
-        return response.data;
+        return response.data.data[0];
       } else {
         console.error(
           "Failed to retrieve lead:",

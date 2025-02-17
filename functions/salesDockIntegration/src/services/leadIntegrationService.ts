@@ -24,10 +24,7 @@ class LeadIntegrationService {
    */
   public getLead = async (leadId: string): Promise<any> => {
     await this.authService.initializeTokens();
-    return {
-      ...(await getLeadById(this.authService, leadId)),
-      tokens: this.authService.getAccessTokens(),
-    };
+    return await getLeadById(this.authService, leadId);
   };
 
   /**
@@ -96,7 +93,10 @@ class LeadIntegrationService {
     //   lead_source_id: "86587",
     //   labels: [20],
     // };
-    return await createLeadInSalesdock(requestData, data.tokens.salesDockToken);
+    return await createLeadInSalesdock(
+      requestData,
+      this.authService.getAccessTokens().salesdock_api_token,
+    );
   };
 
   /**
@@ -105,7 +105,10 @@ class LeadIntegrationService {
    * @returns A promise that resolves to the updated lead data.
    */
   private updateLead = async (data: any): Promise<any> => {
-    return await updateLeadInSalesdock(data, data.tokens.salesDockToken);
+    return await updateLeadInSalesdock(
+      data,
+      this.authService.getAccessTokens().salesdock_api_token,
+    );
   };
 
   /**
@@ -114,7 +117,10 @@ class LeadIntegrationService {
    * @returns A promise that resolves to the converted customer data.
    */
   private convertLead = async (data: any): Promise<any> => {
-    return await convertLeadToCustomer(data, data.tokens.salesDockToken);
+    return await convertLeadToCustomer(
+      data,
+      this.authService.getAccessTokens().salesdock_api_token,
+    );
   };
 
   public getLoggingService = (): LoggingService => {

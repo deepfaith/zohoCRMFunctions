@@ -14,20 +14,28 @@ module.exports = (event: any, context: any) => {
     .then(async (leadCustomer) => {
       if (!leadCustomer)
         throw new Error("Error retrieving a lead by ID from Zoho CRM");
-
       integration
         .handleCrmEvent(eventType, leadCustomer)
         .then(async (data) => {
-          await integration
-            .getLoggingService()
-            .createLog(
-              "handleCrmEvent",
-              "CRM event handled successfully",
-              "SUCCESS",
-              { event: eventType, fromSalesDock: data },
-            );
-          console.log("CRM event handled successfully:", data);
-          context.closeWithSuccess();
+          if (data.responseStatus) {
+            await integration
+              .getLoggingService()
+              .createLog(
+                "handleCrmEvent",
+                "CRM event handled successfully",
+                "SUCCESS",
+                { event: eventType, fromSalesDock: data },
+              );
+            console.log("CRM event handled successfully:", data);
+            context.closeWithSuccess;
+          } else {
+            const errorMessage = `Error handling CRM event`;
+            console.error(errorMessage);
+            await integration
+              .getLoggingService()
+              .createLog("handleCrmEvent", errorMessage, "ERROR", data);
+            context.closeWithFailure();
+          }
         })
         .catch(async (error) => {
           const errorMessage = `Error handling CRM even: ${(error as Error).message}`;
