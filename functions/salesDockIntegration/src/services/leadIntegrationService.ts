@@ -127,7 +127,7 @@ class LeadIntegrationService {
         requestData,
         responseFromAPI,
         "Successfully created lead in Salesdock",
-        data.leadId,
+        data.id,
         responseFromAPI.data.lead_id,
       );
     }
