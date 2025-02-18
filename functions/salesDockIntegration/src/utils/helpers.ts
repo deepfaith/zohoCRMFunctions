@@ -40,3 +40,19 @@ export const serializeParams = (params: any): string => {
     return `Serialization Error: ${error instanceof Error ? error.message : String(error)}`;
   }
 };
+
+/**
+ * Creates a structured error response object.
+ * @param {Record<string, any>} params - Additional parameters to include in the response.
+ * @returns {Record<string, any>} The error response object.
+ */
+export const createErrorResponse = (
+  params: Record<string, any>,
+): Record<string, any> => {
+  return {
+    ...params,
+    success: false,
+    message: "Record not found",
+    code: 404,
+  };
+};

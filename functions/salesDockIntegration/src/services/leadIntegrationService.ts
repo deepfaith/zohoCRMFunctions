@@ -7,7 +7,7 @@ import {
 import zohoAuthService from "./zohoAuthService";
 import LoggingService from "./loggingService";
 import failedIntegrationService from "./failedIntegrationService";
-import { cleanObject } from "../utils";
+import { cleanObject, createErrorResponse } from "../utils";
 import successIntegrationService from "./successIntegrationService";
 
 /**
@@ -141,10 +141,71 @@ class LeadIntegrationService {
    * @returns A promise that resolves to the updated lead data.
    */
   private updateLead = async (data: any): Promise<any> => {
-    return await updateLeadInSalesdock(
-      data,
-      this.authService.getAccessTokens().salesdock_api_token,
-    );
+    const getIntegrationRecord =
+      await this.successConnectionService.getRecordSuccessIntegrationBySource(
+        "zoho",
+        data.id,
+      ); // get the integration record
+
+    const requestData = cleanObject({
+      firstname: data.First_Name ?? "",
+      postcode: data.Zip_Code ?? "",
+      streetname: data.Street ?? "",
+      city: data.City ?? "",
+      email: data.Email ?? "",
+      phone: (data.Phone || data.Mobile) ?? "",
+      business: data.Company ? "1" : "0",
+      company_name: data.Company ?? "ZohoCRM",
+    });
+
+    if (getIntegrationRecord && getIntegrationRecord?.destination_id) {
+      const responseFromAPI = await updateLeadInSalesdock(
+        requestData,
+        this.authService.getAccessTokens().salesdock_api_token,
+        getIntegrationRecord.destination_id,
+      );
+
+      if (responseFromAPI.responseStatus === 0) {
+        await this.failedConnectionService.recordFailedIntegrations(
+          "zoho",
+          "salesdock",
+          data.id,
+          "updateLead",
+          requestData,
+          responseFromAPI,
+          `Failed to create lead in Salesdock: ${responseFromAPI.message}`,
+        );
+      } else {
+        await this.successConnectionService.recordSuccessIntegrations(
+          "zoho",
+          "salesdock",
+          "updateLead",
+          requestData,
+          responseFromAPI,
+          "Successfully created lead in Salesdock",
+          data.id,
+          responseFromAPI.data.lead_id,
+        );
+      }
+
+      return responseFromAPI;
+    } else {
+      const errorData = createErrorResponse({
+        data: { lead_id: data.id },
+      });
+      await this.failedConnectionService.recordFailedIntegrations(
+        "zoho",
+        "salesdock",
+        data.id,
+        "updateLead",
+        requestData,
+        errorData,
+        `Failed to update lead in Salesdock. Integration does not exists: ${errorData.message}`,
+      );
+      throw new Error(
+        `Failed to update lead in Salesdock. Integration does not exists: ${errorData.message}`,
+      );
+    }
   };
 
   /**

@@ -44,22 +44,43 @@ export const createLeadInSalesdock = async (
  *
  * @param {any} data - The lead data to update.
  * @param salesDockApiKey
+ * @param {string} leadId - The ID of the lead to retrieve.
  * @returns {Promise<any>} - A promise that resolves to the updated lead data.
  */
 export const updateLeadInSalesdock = async (
   data: any,
   salesDockApiKey: string,
+  leadId: string,
 ): Promise<any> => {
-  const response: AxiosResponse<any> = await axios.put(
-    `${salesDockUrl}/leads/${data.lead_id}`,
-    {
-      status: data.new_status,
-    },
-    {
-      headers: { Authorization: `Bearer ${salesDockApiKey}` },
-    },
-  );
-  return response.data;
+  try {
+    const reqData = JSON.stringify(data);
+    const response = await axios.put(
+      `${salesDockUrl}/leads/${leadId}`,
+      reqData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${salesDockApiKey}`,
+        },
+      },
+    );
+    return { responseStatus: 1, ...response.data };
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        // Handle non-fatal API errors (e.g., validation errors, unauthorized, etc.)
+        console.warn(
+          `API responded with status ${error.response.status}:`,
+          error.response.data,
+        );
+        return { responseStatus: 0, ...error.response.data };
+      }
+    }
+    const errorMessage = `Error while updating a lead to salesDock: ${(error as Error).message}`;
+    console.error(errorMessage, error);
+    throw new Error(errorMessage);
+  }
 };
 
 /**

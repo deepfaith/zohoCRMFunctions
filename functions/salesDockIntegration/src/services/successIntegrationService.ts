@@ -15,6 +15,35 @@ class successIntegrationService {
   }
 
   /**
+   * Retrieves a record from the SuccessIntegrations table based on the source and source_id.
+   * @param {string} source - The source identifier for the integration.
+   * @param {number} source_id - The unique ID associated with the source.
+   * @returns {Promise<any>} A promise that resolves to the record if found, otherwise null.
+   */
+  public getRecordSuccessIntegrationBySource = async (
+    source: string,
+    source_id: number,
+  ): Promise<any> => {
+    try {
+      const zcql = this.catalystApp.zcql();
+      const query = `SELECT *
+                     FROM SuccessIntegrations
+                     WHERE source = '${source}'
+                       AND source_id = '${source_id}' LIMIT 1`;
+      const records = await zcql.executeZCQLQuery(query);
+      return records.length > 0 ? records[0].SuccessIntegrations : null;
+    } catch (error) {
+      console.error(
+        "Error fetching access SuccessIntegrations:",
+        (error as Error).message,
+      );
+      throw new Error(
+        "Failed to fetch access SuccessIntegrations from Data Store",
+      );
+    }
+  };
+
+  /**
    * Records success integrations into a datastore.
    * @param source The source of the integration.
    * @param destination The destination of the integration.
