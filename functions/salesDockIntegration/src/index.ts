@@ -14,6 +14,7 @@ module.exports = (event: any, context: any) => {
     .then(async (leadCustomer) => {
       if (!leadCustomer)
         throw new Error("Error retrieving a lead by ID from Zoho CRM");
+      leadCustomer.leadId = leadId;
       integration
         .handleCrmEvent(eventType, leadCustomer)
         .then(async (data) => {

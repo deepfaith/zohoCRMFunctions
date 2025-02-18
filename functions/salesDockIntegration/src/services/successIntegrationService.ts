@@ -30,6 +30,8 @@ class successIntegrationService {
     requestData: any,
     responseSuccess: any,
     message: string,
+    source_id: number,
+    destination_id: number,
   ): Promise<void> => {
     try {
       const dataStore = this.catalystApp.datastore();
@@ -43,6 +45,8 @@ class successIntegrationService {
         request_data: serializeParams(requestData),
         response_success: serializeParams(responseSuccess),
         message: message,
+        source_id: source_id,
+        destination_id: destination_id,
       });
     } catch (error) {
       console.error(
