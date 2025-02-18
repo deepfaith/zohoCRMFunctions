@@ -41,7 +41,7 @@ class successIntegrationService {
         destination: destination,
         integration_point: integrationPoint,
         request_data: serializeParams(requestData),
-        response_error: serializeParams(responseSuccess),
+        response_success: serializeParams(responseSuccess),
         message: message,
       });
     } catch (error) {
