@@ -18,6 +18,7 @@ class failedIntegrationService {
    * Records failed integrations into a datastore.
    * @param source The source of the integration.
    * @param destination The destination of the integration.
+   * @param source_id The integration source id.
    * @param integrationPoint The specific point of integration failure.
    * @param requestData The data sent in the request.
    * @param responseError The error received in response.
@@ -26,6 +27,7 @@ class failedIntegrationService {
   public recordFailedIntegrations = async (
     source: string,
     destination: string,
+    source_id: string,
     integrationPoint: string,
     requestData: any,
     responseError: any,
@@ -38,6 +40,7 @@ class failedIntegrationService {
       await failedIntegrationTable.insertRow({
         org_id: this.orgId,
         source: source,
+        source_id: source_id,
         destination: destination,
         integration_point: integrationPoint,
         request_data: serializeParams(requestData),

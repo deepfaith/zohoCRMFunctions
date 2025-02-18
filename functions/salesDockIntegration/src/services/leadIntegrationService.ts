@@ -114,6 +114,7 @@ class LeadIntegrationService {
       await this.failedConnectionService.recordFailedIntegrations(
         "zoho",
         "salesdock",
+        data.id,
         "createLead",
         requestData,
         responseFromAPI,

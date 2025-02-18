@@ -20,8 +20,10 @@ class successIntegrationService {
    * @param destination The destination of the integration.
    * @param integrationPoint The specific point of integration success.
    * @param requestData The data sent in the request.
-   * @param responseError The error received in response.
+   * @param responseSuccess The response from the request.
    * @param message A message describing the success.
+   * @param source_id The integration source id.
+   * @param destination_id The integration destination id.
    */
   public recordSuccessIntegrations = async (
     source: string,
