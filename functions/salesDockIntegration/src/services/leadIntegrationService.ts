@@ -6,15 +6,28 @@ import {
 } from "../entities/salesdock";
 import zohoAuthService from "./zohoAuthService";
 import LoggingService from "./loggingService";
+import failedIntegrationService from "./failedIntegrationService";
+import { cleanObject } from "../utils";
+import successIntegrationService from "./successIntegrationService";
 
 /**
  * Service class for Zoho CRM operations.
  */
 class LeadIntegrationService {
   private authService: zohoAuthService;
+  private failedConnectionService: failedIntegrationService;
+  private successConnectionService: successIntegrationService;
 
   constructor(catalystApp: any, orgId: string) {
     this.authService = new zohoAuthService(orgId, catalystApp);
+    this.failedConnectionService = new failedIntegrationService(
+      orgId,
+      catalystApp,
+    );
+    this.successConnectionService = new successIntegrationService(
+      orgId,
+      catalystApp,
+    );
   }
 
   /**
@@ -57,7 +70,7 @@ class LeadIntegrationService {
    * @returns A promise that resolves to the created lead data.
    */
   private createLead = async (data: any): Promise<any> => {
-    const requestData = {
+    const requestData = cleanObject({
       firstname: data.First_Name ?? "",
       postcode: data.Zip_Code ?? "",
       streetname: data.Street ?? "",
@@ -66,7 +79,7 @@ class LeadIntegrationService {
       phone: (data.Phone || data.Mobile) ?? "",
       business: data.Company ? "1" : "0",
       company_name: data.Company ?? "ZohoCRM",
-    };
+    });
 
     // const requestData = {
     //   gender: "female",
@@ -93,10 +106,30 @@ class LeadIntegrationService {
     //   lead_source_id: "86587",
     //   labels: [20],
     // };
-    return await createLeadInSalesdock(
+    const responseFromAPI = await createLeadInSalesdock(
       requestData,
       this.authService.getAccessTokens().salesdock_api_token,
     );
+    if (responseFromAPI.responseStatus === 0) {
+      await this.failedConnectionService.recordFailedIntegrations(
+        "zoho",
+        "salesdock",
+        "createLead",
+        requestData,
+        responseFromAPI,
+        `Failed to create lead in Salesdock: ${responseFromAPI.message}`,
+      );
+    } else {
+      await this.successConnectionService.recordSuccessIntegrations(
+        "zoho",
+        "salesdock",
+        "createLead",
+        requestData,
+        responseFromAPI,
+        "Successfully created lead in Salesdock",
+      );
+    }
+    return responseFromAPI;
   };
 
   /**

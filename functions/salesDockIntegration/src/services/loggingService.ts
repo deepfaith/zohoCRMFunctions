@@ -1,4 +1,5 @@
 import FormData from "form-data";
+import { serializeParams } from "../utils";
 
 class LoggingService {
   private catalystApp: any;
@@ -32,7 +33,7 @@ class LoggingService {
         message: message,
         updated_at: new Date().toISOString(),
         log_level: logLevel,
-        params: this.serializeParams(params),
+        params: serializeParams(params),
       });
     } catch (error) {
       console.error(
@@ -40,32 +41,6 @@ class LoggingService {
         (error as Error).message,
       );
       throw new Error("Failed to initialize logs from Data Store");
-    }
-  };
-
-  /**
-   * Serializes various types of `params` into a string format.
-   *
-   * @param {any} params - The parameter value to be serialized.
-   * @returns {string} - A string representation of the parameter.
-   *
-   * - If `params` is an `Error` object, it extracts `name`, `message`, and `stack`.
-   * - If `params` is `FormData`, it converts it to a URL-encoded string.
-   * - If `params` is an object, it converts it to JSON.
-   * - If `params` throws an error during serialization, it logs a fallback error message.
-   */
-  private serializeParams = (params: any): string => {
-    try {
-      if (params instanceof Error) {
-        return JSON.stringify({
-          name: params.name,
-          message: params.message,
-          stack: params.stack,
-        });
-      }
-      return JSON.stringify(params);
-    } catch (error) {
-      return `Serialization Error: ${error instanceof Error ? error.message : String(error)}`;
     }
   };
 }
